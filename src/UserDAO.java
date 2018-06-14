@@ -8,7 +8,6 @@ import java.util.ArrayList;
 public class UserDAO {
 
 	private static String usersFileLocation = "users.txt";
-	private static String musicsFileLocation = "musics.txt";
 	private static String playlistsFileLocation = "playlists.txt";
 	
 	static private ArrayList <User> users = new ArrayList<User> ();
@@ -48,12 +47,8 @@ public class UserDAO {
 				
 				line = bf.readLine();
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			new UserIsNotAuthenticatedException("User and/or pass incorrect", e).printStackTrace();
 		}
 		
 		return null;

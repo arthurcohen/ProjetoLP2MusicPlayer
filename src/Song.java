@@ -1,18 +1,28 @@
+import java.io.File;
 
 public class Song {
 
-	private String title;
+	private String path;
 	
-	Song ( String title ) {
-		this.setTitle(title);
+	Song ( String path ) {
+		this.setPath(path);
 	}
 
-	public String getTitle() {
-		return title;
+	public String getPath() {
+		return path;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setPath(String path) {
+		this.path = path;
+	}	
+	
+	public String getName() {
+		File f = new File(this.path);
+		
+		return f.getName();
 	}
 	
+	public String toString() {
+		return getName();
+	}
 }
