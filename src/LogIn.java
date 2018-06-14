@@ -10,6 +10,8 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
@@ -21,6 +23,7 @@ public class LogIn extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static final String[] localFiles = {"users.txt", "playlists.txt", "musics.txt"};
 	private JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
@@ -34,11 +37,24 @@ public class LogIn extends JFrame {
 				try {
 					LogIn frame = new LogIn();
 					frame.setVisible(true);
+					createLocalFiles();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+	
+	public static void createLocalFiles() {
+		for (String file : localFiles) {
+			File f = new File(file);
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
