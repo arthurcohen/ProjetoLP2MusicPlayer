@@ -3,11 +3,12 @@ public class User {
 
 	private String username;
 	private String password;
-	//private boolean vip;
+	private boolean vip;
 	
-	User ( String username, String password ) {
-		this.setUsername(username);
-		this.setPassword(password);
+	User ( String username, String password, boolean vip) {
+		this.username = username;
+		this.password = password;
+		this.vip = vip;
 	}
 
 	public String getUsername() {
@@ -24,6 +25,18 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String toUsersFile() {
+		return String.format("%s\n%s\n%s\n", this.username, this.password, this.vip);
+	}
+
+	public boolean isVip() {
+		return vip;
+	}
+
+	public void setVip(boolean vip) {
+		this.vip = vip;
 	}
 	
 	
