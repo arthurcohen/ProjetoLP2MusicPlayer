@@ -82,9 +82,7 @@ public class MusicPlayer extends JFrame {
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-		
-		
+		menuBar.add(mnFile);		
 
 		JScrollPane scrollPane = new JScrollPane();
 		
@@ -95,7 +93,7 @@ public class MusicPlayer extends JFrame {
 		
 		DefaultListModel<Song> musicas = new DefaultListModel<Song>();
 		
-		for (Song song : SongDAO.getSongs()) {
+		for (Song song : SongDAOImpl.getSongs()) {
 			musicas.addElement(song);
 		}
 		
@@ -129,13 +127,13 @@ public class MusicPlayer extends JFrame {
 					int index = file.getName().lastIndexOf(".");
 					JPopupMenu popup = new JPopupMenu("Popup");
 					if (file.getName().substring(index+1).equals("mp3")) {
-						SongDAO.addSong(new Song(file.getAbsolutePath()));
+						SongDAOImpl.addSong(new Song(file.getAbsolutePath()));
 						popup.add(new JMenuItem("Musica adicionada a biblioteca"));
 					}else {
-						popup.add(new JMenuItem("Extenção inválida"));
+						popup.add(new JMenuItem("Extenï¿½ï¿½o invï¿½lida"));
 					}
 					DefaultListModel<Song> musicasAtt = new DefaultListModel<Song>();
-					for (Song song : SongDAO.getSongs()) {
+					for (Song song : SongDAOImpl.getSongs()) {
 						System.out.println("att");
 						musicasAtt.addElement(song);
 					}

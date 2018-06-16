@@ -76,7 +76,7 @@ public class LogIn extends JFrame {
 		JButton btnLogin = new JButton("Sing In");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				User user = UserDAO.authenticateUser(new User(textField.getText(), passwordField.getText(), false));
+				User user = UserDAOImpl.authenticateUser(new User(textField.getText(), passwordField.getText(), false));
 				if (user != null) {
 					MusicPlayer player = new MusicPlayer ();
 					player.setVisible(true);
