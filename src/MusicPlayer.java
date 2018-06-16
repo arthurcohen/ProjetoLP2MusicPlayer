@@ -34,6 +34,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 
 public class MusicPlayer extends JFrame {
 
@@ -52,6 +54,7 @@ public class MusicPlayer extends JFrame {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			
 			public void run() {
 				try {
 					MusicPlayer frame = new MusicPlayer();
@@ -71,13 +74,47 @@ public class MusicPlayer extends JFrame {
 	public MusicPlayer() {
 		setTitle ("Music Player");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 645, 425);
+		setBounds(100, 100, 370, 400);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
+		
+		
+
+		JScrollPane scrollPane = new JScrollPane();
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		
+		JList<String> list_1 = new JList<String>();
+		scrollPane_1.setViewportView(list_1);
+		
+		DefaultListModel<Song> musicas = new DefaultListModel<Song>();
+		
+		for (Song song : SongDAO.getSongs()) {
+			musicas.addElement(song);
+		}
+		
+		JList<Song> list = new JList<Song>(musicas);
+		scrollPane.setViewportView(list);
+
+		
+		
+		list.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				System.out.println(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+				if (player != null) player.stop();
+				File musicFile = new File(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+				Media music = new Media(musicFile.toURI().toString());
+				player = new MediaPlayer(music);	
+				player.play();
+				currentSong = ((JList)e.getSource()).getSelectedIndex();
+			}
+		});
 		
 		JButton btnNewSong = new JButton("New song");
 		btnNewSong.addActionListener(new ActionListener() {
@@ -95,39 +132,32 @@ public class MusicPlayer extends JFrame {
 					}else {
 						popup.add(new JMenuItem("Extenção inválida"));
 					}
+					DefaultListModel<Song> musicasAtt = new DefaultListModel<Song>();
+					for (Song song : SongDAO.getSongs()) {
+						System.out.println("att");
+						musicasAtt.addElement(song);
+					}
+					
+					JList<Song> listAtt = new JList<Song>(musicasAtt);
+					listAtt.addListSelectionListener(new ListSelectionListener() {
+						
+						@Override
+						public void valueChanged(ListSelectionEvent e) {
+							System.out.println("123" + ((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+							if (player != null) player.stop();
+							File musicFile = new File(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+							Media music = new Media(musicFile.toURI().toString());
+							player = new MediaPlayer(music);	
+							player.play();
+							currentSong = ((JList)e.getSource()).getSelectedIndex();
+						}
+					});
+					scrollPane.setViewportView(listAtt);
+					
 					popup.show(MusicPlayer.this, 250, 200);
 				}
 			}
 		});
-		
-
-		JList<Song> list;
-		DefaultListModel<Song> musicas = new DefaultListModel<Song>();
-		
-		for (Song song : SongDAO.getSongs()) {
-			musicas.addElement(song);
-		}
-		
-		list = new JList<Song>(musicas);
-		
-		
-		list.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				System.out.println(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
-				if (player != null) player.stop();
-				File musicFile = new File(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
-				Media music = new Media(musicFile.toURI().toString());
-				player = new MediaPlayer(music);	
-				player.play();
-				currentSong = ((JList)e.getSource()).getSelectedIndex();
-			}
-		});
-		
-		JList<String> list_1 = new JList<String>();
-		
-		JList<String> list_2 = new JList<String>();
 		
 		mnFile.add(btnNewSong);
 		
@@ -137,24 +167,11 @@ public class MusicPlayer extends JFrame {
 		JButton btnRemoveSong = new JButton("Remove song");
 		mnEdit.add(btnRemoveSong);
 		
-		JMenu mnNewMenu = new JMenu("Options");
-		menuBar.add(mnNewMenu);
+		JMenu mnPlaylists = new JMenu("Playlists");
+		menuBar.add(mnPlaylists);
 		
-		JButton btnLogout_1 = new JButton("Logout");
-		btnLogout_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setVisible(false);
-				LogIn newLogin = new LogIn ();
-				newLogin.setVisible (true);
-			}
-		});
-		mnNewMenu.add(btnLogout_1);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		
-		JButton btnLogout = new JButton("Add playlist");
-		btnLogout.addActionListener(new ActionListener() {
+		JButton btnAddPlaylist = new JButton("Add Playlist");
+		btnAddPlaylist.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -182,20 +199,44 @@ public class MusicPlayer extends JFrame {
 				}
 			}
 		});
+		mnPlaylists.add(btnAddPlaylist);
+		
+		JSeparator separator = new JSeparator();
+		mnPlaylists.add(separator);
+		
+		JMenu mnNewMenu = new JMenu("Options");
+		menuBar.add(mnNewMenu);
+		
+		JButton btnLogout_1 = new JButton("Logout");
+		btnLogout_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				LogIn newLogin = new LogIn ();
+				newLogin.setVisible (true);
+				player.dispose();
+				dispose();
+			}
+		});
+		mnNewMenu.add(btnLogout_1);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
 
 		
 		JButton btnPlay = new JButton("Play");
 		btnPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (player == null) {
+				if (player == null && list.getModel().getSize() > 0) {
+					System.out.println(list.getModel().getSize());
 					File musicFile = new File(list.getModel().getElementAt(0).getPath());
 					Media music = new Media(musicFile.toURI().toString());
 					player = new MediaPlayer(music);						
 				}
-				if (!player.getStatus().equals(Status.PLAYING)){
-					player.play();
-				}else {
-					player.pause();
+				if (player != null) {
+					if (!player.getStatus().equals(Status.PLAYING)){
+						player.play();
+					}else{
+						player.pause();
+					}					
 				}
 			}
 		});
@@ -259,59 +300,53 @@ public class MusicPlayer extends JFrame {
 			}
 		});
 		
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.TRAILING)
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(81)
+					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addGroup(gl_contentPane.createSequentialGroup()
-								.addComponent(list, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)
-								.addGap(18)
-								.addComponent(list_1, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(17)
 							.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnPlay)
+							.addComponent(btnPlay, GroupLayout.PREFERRED_SIZE, 84, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(button, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_3, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)))
-					.addGap(50)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(list_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnLogout))
-					.addContainerGap())
+							.addComponent(button_3, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)))
+					.addGap(10))
 		);
 		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.TRAILING)
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(44)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(list_1, GroupLayout.PREFERRED_SIZE, 227, GroupLayout.PREFERRED_SIZE)
-								.addComponent(list, GroupLayout.PREFERRED_SIZE, 227, GroupLayout.PREFERRED_SIZE))
-							.addGap(18)
-							.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnPlay)
-								.addComponent(button)
-								.addComponent(button_1)
-								.addComponent(button_2)
-								.addComponent(button_3)))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(list_2, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(btnLogout)))
-					.addContainerGap())
+					.addContainerGap()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
+						.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnPlay)
+						.addComponent(button_1)
+						.addComponent(button_2)
+						.addComponent(button_3)
+						.addComponent(button))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
+		
+		
+		
+		
+		
 		contentPane.setLayout(gl_contentPane);
 	}
 }
