@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.awt.MenuItem;
 import java.awt.Point;
 
 import javafx.beans.NamedArg;
@@ -93,14 +94,13 @@ public class MusicPlayer extends JFrame {
 		
 		DefaultListModel<Song> musicas = new DefaultListModel<Song>();
 		
-		for (Song song : SongDAOImpl.getSongs()) {
+		for (Song song : SongDAO.getSongs()) {
 			musicas.addElement(song);
 		}
 		
 		JList<Song> list = new JList<Song>(musicas);
 		scrollPane.setViewportView(list);
 
-		
 		
 		list.addListSelectionListener(new ListSelectionListener() {
 			
@@ -116,6 +116,101 @@ public class MusicPlayer extends JFrame {
 			}
 		});
 		
+		list_1.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				System.out.println(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+				if (player != null) player.stop();
+				File musicFile = new File(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+				Media music = new Media(musicFile.toURI().toString());
+				player = new MediaPlayer(music);	
+				player.play();
+				currentSong = ((JList)e.getSource()).getSelectedIndex();
+			}
+		});
+		
+		
+		
+		
+		JMenu mnEdit = new JMenu("Edit");
+		menuBar.add(mnEdit);
+		
+		JButton btnRemoveSong = new JButton("Remove song");
+		mnEdit.add(btnRemoveSong);
+		
+		JMenu mnPlaylists = new JMenu("Playlists");
+		JButton btnAddPlaylist = new JButton("Add Playlist");
+		btnAddPlaylist.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				
+				int returnVal = chooser.showOpenDialog(MusicPlayer.this);
+				
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File path = chooser.getSelectedFile();
+					File[] files = path.listFiles();
+					
+					JPopupMenu popup = new JPopupMenu("Popup");
+					int musicAddCount = 0;
+
+					Playlist playlist = new Playlist(path.getName(), "arthur");
+					
+					for (File file : files) {
+						int index = file.getName().lastIndexOf(".");
+						if (file.getName().substring(index+1).equals("mp3")) {
+							playlist.getSongs().add(new Song(file.getAbsolutePath()));
+						}
+					}
+					
+					PlaylistDAO.savePlaylist(playlist);
+					
+					popup.add(new JMenuItem(playlist.getSongs().size() + " musicas adicionadas a playlist " + path.getName()));
+					popup.show(MusicPlayer.this, 250, 200);
+					
+					
+				}
+			}
+		});
+		mnPlaylists.add(btnAddPlaylist);
+		
+		JSeparator separator = new JSeparator();
+		mnPlaylists.add(separator);
+		
+		for (Playlist playlist : PlaylistDAO.getPlaylists(new User("arthur", "123", true))){
+			JMenuItem item = new JMenuItem(playlist.getName());
+			item.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					DefaultListModel<Song> musicasAtt = new DefaultListModel<Song>();
+					for (Song song : playlist.getSongs()) {
+						System.out.println("att playlist");
+						musicasAtt.addElement(song);
+					}
+					
+					JList<Song> listAtt = new JList<Song>(musicasAtt);
+
+					listAtt.addListSelectionListener(new ListSelectionListener() {
+						@Override
+						public void valueChanged(ListSelectionEvent e) {
+							System.out.println(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+							if (player != null) player.stop();
+							File musicFile = new File(((Song)((JList)e.getSource()).getSelectedValue()).getPath());
+							Media music = new Media(musicFile.toURI().toString());
+							player = new MediaPlayer(music);	
+							player.play();
+							currentSong = ((JList)e.getSource()).getSelectedIndex();
+						}
+					});
+					scrollPane_1.setViewportView(listAtt);
+				}
+			});
+			mnPlaylists.add(item);
+		}
+		
+		
 		JButton btnNewSong = new JButton("New song");
 		btnNewSong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -127,13 +222,13 @@ public class MusicPlayer extends JFrame {
 					int index = file.getName().lastIndexOf(".");
 					JPopupMenu popup = new JPopupMenu("Popup");
 					if (file.getName().substring(index+1).equals("mp3")) {
-						SongDAOImpl.addSong(new Song(file.getAbsolutePath()));
+						SongDAO.addSong(new Song(file.getAbsolutePath()));
 						popup.add(new JMenuItem("Musica adicionada a biblioteca"));
 					}else {
 						popup.add(new JMenuItem("Exten��o inv�lida"));
 					}
 					DefaultListModel<Song> musicasAtt = new DefaultListModel<Song>();
-					for (Song song : SongDAOImpl.getSongs()) {
+					for (Song song : SongDAO.getSongs()) {
 						System.out.println("att");
 						musicasAtt.addElement(song);
 					}
@@ -158,52 +253,12 @@ public class MusicPlayer extends JFrame {
 				}
 			}
 		});
-		
+
 		mnFile.add(btnNewSong);
 		
-		JMenu mnEdit = new JMenu("Edit");
-		menuBar.add(mnEdit);
-		
-		JButton btnRemoveSong = new JButton("Remove song");
-		mnEdit.add(btnRemoveSong);
-		
-		JMenu mnPlaylists = new JMenu("Playlists");
 		menuBar.add(mnPlaylists);
 		
-		JButton btnAddPlaylist = new JButton("Add Playlist");
-		btnAddPlaylist.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				
-				int returnVal = chooser.showOpenDialog(MusicPlayer.this);
-				
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File path = chooser.getSelectedFile();
-					File[] files = path.listFiles();
-					
-					JPopupMenu popup = new JPopupMenu("Popup");
-					int musicAddCount = 0;
-					
-					List<Song> playListSongs = new ArrayList<Song>();
-					
-					for (File file : files) {
-						int index = file.getName().lastIndexOf(".");
-						if (file.getName().substring(index+1).equals("mp3")) {
-							playListSongs.add(new Song(file.getAbsolutePath()));
-						}
-					}
-					popup.add(new JMenuItem(playListSongs.size() + " musicas adicionadas a playlist " + path.getName()));
-					popup.show(MusicPlayer.this, 250, 200);
-					
-					
-				}
-			}
-		});
-		mnPlaylists.add(btnAddPlaylist);
 		
-		JSeparator separator = new JSeparator();
-		mnPlaylists.add(separator);
 		
 		JMenu mnNewMenu = new JMenu("Options");
 		menuBar.add(mnNewMenu);

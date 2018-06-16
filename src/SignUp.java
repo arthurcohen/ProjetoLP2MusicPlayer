@@ -70,7 +70,7 @@ public class SignUp extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if ( passwordField.getText().equals( passwordField_1.getText() ) ) {
 					User newUser = new User ( textField.getText(), passwordField.getText(), false);
-					UserDAOImpl.addUser(newUser);
+					UserDAO.addUser(newUser);
 					setVisible(false);
 					LogIn login = new LogIn ();
 					login.setVisible(true);
