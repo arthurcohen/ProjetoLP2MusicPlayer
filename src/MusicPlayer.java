@@ -80,32 +80,7 @@ public class MusicPlayer extends JFrame {
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
-		menuBar.add(mnFile);
-		
-<<<<<<< HEAD
-		JButton btnNewSong = new JButton("New song");
-		btnNewSong.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser chooser = new JFileChooser();
-				int returnVal = chooser.showOpenDialog(MusicPlayer.this);
-				
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = chooser.getSelectedFile();
-					int index = file.getName().lastIndexOf(".");
-					JPopupMenu popup = new JPopupMenu("Popup");
-					if (file.getName().substring(index+1).equals("mp3")) {
-						SongDAOImpl.addSong(new Song(file.getAbsolutePath()));
-						popup.add(new JMenuItem("Musica adicionada a biblioteca"));
-					}else {
-						popup.add(new JMenuItem("Extenção inválida"));
-					}
-					popup.show(MusicPlayer.this, 250, 200);
-				}
-			}
-		});
-=======
->>>>>>> 8e3674ddf6e7c1b4b0dc5396222b009653e2267c
-		
+		menuBar.add(mnFile);		
 
 		JScrollPane scrollPane = new JScrollPane();
 		
@@ -150,13 +125,13 @@ public class MusicPlayer extends JFrame {
 					int index = file.getName().lastIndexOf(".");
 					JPopupMenu popup = new JPopupMenu("Popup");
 					if (file.getName().substring(index+1).equals("mp3")) {
-						SongDAO.addSong(new Song(file.getAbsolutePath()));
+						SongDAOImpl.addSong(new Song(file.getAbsolutePath()));
 						popup.add(new JMenuItem("Musica adicionada a biblioteca"));
 					}else {
 						popup.add(new JMenuItem("Extenção inválida"));
 					}
 					DefaultListModel<Song> musicasAtt = new DefaultListModel<Song>();
-					for (Song song : SongDAO.getSongs()) {
+					for (Song song : SongDAOImpl.getSongs()) {
 						System.out.println("att");
 						musicasAtt.addElement(song);
 					}
