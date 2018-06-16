@@ -22,6 +22,8 @@ import javax.swing.JFileChooser;
 
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -185,14 +187,15 @@ public class MusicPlayer extends JFrame {
 					JPopupMenu popup = new JPopupMenu("Popup");
 					int musicAddCount = 0;
 					
+					List<Song> playListSongs = new ArrayList<Song>();
+					
 					for (File file : files) {
 						int index = file.getName().lastIndexOf(".");
 						if (file.getName().substring(index+1).equals("mp3")) {
-							SongDAO.addSong(new Song(file.getAbsolutePath()));
-							musicAddCount++;
-						}	
+							playListSongs.add(new Song(file.getAbsolutePath()));
+						}
 					}
-					popup.add(new JMenuItem(musicAddCount + " musicas adicionadas a playlist " + path.getName()));
+					popup.add(new JMenuItem(playListSongs.size() + " musicas adicionadas a playlist " + path.getName()));
 					popup.show(MusicPlayer.this, 250, 200);
 					
 					

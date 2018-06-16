@@ -46,6 +46,7 @@ public class SongDAO {
 	}
 	
 	private static void loadSongs() {
+		songs = new ArrayList<Song>();
 		FileReader fr;
 		try {
 			fr = new FileReader(musicsFileLocation);
