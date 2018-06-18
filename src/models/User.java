@@ -1,3 +1,4 @@
+package models;
 
 public class User {
 
@@ -5,7 +6,7 @@ public class User {
 	private String password;
 	private boolean vip;
 	
-	User ( String username, String password, boolean vip) {
+	public User ( String username, String password, boolean vip) {
 		this.username = username;
 		this.password = password;
 		this.vip = vip;

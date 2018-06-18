@@ -1,10 +1,11 @@
+package models;
 import java.io.File;
 
 public class Song {
 
 	private String path;
 	
-	Song ( String path ) {
+	public Song ( String path ) {
 		this.setPath(path);
 	}
 

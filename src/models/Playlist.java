@@ -1,3 +1,4 @@
+package models;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,7 +7,7 @@ public class Playlist {
 	private String owner;
 	private ArrayList<Song> songs;
 	
-	Playlist(String path, String owner, List<Song> songs) {
+	public Playlist(String path, String owner, List<Song> songs) {
 		this.name = path;
 		this.owner = owner;
 		this.songs = (ArrayList<Song>) songs;

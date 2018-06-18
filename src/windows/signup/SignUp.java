@@ -1,12 +1,23 @@
+package windows.signup;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JButton;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+
+import models.User;
+import models.dao.UserDAO;
+import windows.login.LogIn;
+import windows.player.MusicPlayer;
+
 import javax.swing.JPasswordField;
+import javax.swing.JPopupMenu;
+
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -76,8 +87,9 @@ public class SignUp extends JFrame {
 					login.setVisible(true);
 				}
 				else {
-					AlertMessage alert = new AlertMessage ();
-					alert.setVisible(true);
+					JPopupMenu popup = new JPopupMenu("Popup");
+					popup.add(new JMenuItem(" Senhas diferentes " ));
+					popup.show(SignUp.this, 90, 50);
 				}
 			}
 		});

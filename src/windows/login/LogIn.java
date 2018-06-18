@@ -1,3 +1,4 @@
+package windows.login;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -5,6 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import javafx.embed.swing.JFXPanel;
+import models.User;
+import models.dao.UserDAO;
+import windows.player.MusicPlayer;
+import windows.signup.SignUp;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;

@@ -1,3 +1,4 @@
+package windows.player;
 import java.awt.EventQueue;
 import java.awt.MenuItem;
 import java.awt.Point;
@@ -8,6 +9,12 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.util.Duration;
+import models.Playlist;
+import models.Song;
+import models.User;
+import models.dao.PlaylistDAO;
+import models.dao.SongDAO;
+import windows.login.LogIn;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
