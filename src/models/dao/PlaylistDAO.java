@@ -24,6 +24,7 @@ public interface PlaylistDAO {
 	}
 	
 	public static List<Playlist> getPlaylists(User user) {
+		System.out.println(user.getUsername());
 		return loadPlaylist(user);
 	}
 	

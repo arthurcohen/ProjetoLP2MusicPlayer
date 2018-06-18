@@ -16,6 +16,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -54,7 +55,11 @@ public class LogIn extends JFrame {
 		for (String file : localFiles) {
 			File f = new File(file);
 			try {
-				f.createNewFile();
+				if (f.createNewFile() && file.equals("users.txt")) {
+					FileWriter fw = new FileWriter(f);
+					fw.append("admin\nadmin\ntrue\n");
+					fw.close();
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -83,7 +88,7 @@ public class LogIn extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				User user = UserDAO.authenticateUser(new User(textField.getText(), passwordField.getText(), false));
 				if (user != null) {
-					MusicPlayer player = new MusicPlayer ();
+					MusicPlayer player = new MusicPlayer (user);
 					player.setVisible(true);
 					setVisible(false);
 				}

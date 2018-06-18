@@ -14,6 +14,7 @@ import models.Song;
 import models.User;
 import models.dao.PlaylistDAO;
 import models.dao.SongDAO;
+import models.dao.UserDAO;
 import windows.login.LogIn;
 
 import javax.swing.JFrame;
@@ -57,32 +58,19 @@ public class MusicPlayer extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	
+	private User currentUser;
+	
 	private MediaPlayer player;
 	private int currentSong;
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			
-			public void run() {
-				try {
-					MusicPlayer frame = new MusicPlayer();
-					frame.setVisible(true);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-		});
-	}
 
 	/**
 	 * Create the frame.
 	 */
-	public MusicPlayer() {
-		setTitle ("Music Player");
+	public MusicPlayer(User currentUser) {
+		setTitle ("Music Player - " + currentUser.getUsername() + (currentUser.isVip() ? " (VIP)" : ""));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 370, 400);
 		
@@ -150,6 +138,32 @@ public class MusicPlayer extends JFrame {
 		JButton btnAddPlaylist = new JButton("Add Playlist");
 		btnAddPlaylist.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				if (!currentUser.isVip()) {
+					JPopupMenu popup = new JPopupMenu("VIP");
+					popup.add(new JMenuItem("Área restrita apenas para usuários VIP"));
+					popup.add(new JSeparator());
+					popup.add(new JMenuItem("Assine por apenas R$ 1,99 os primeiros 3 meses"));
+					JButton assinar = new JButton("ASSINAR");
+					assinar.addActionListener(new ActionListener() {
+						
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							currentUser.setVip(true);
+							UserDAO.saveUser(currentUser);
+							LogIn login = new LogIn();
+							if (player != null)
+								player.dispose();
+							dispose();
+							login.setVisible(true);
+						}
+					});
+					popup.add(assinar);
+					popup.show(MusicPlayer.this, 150, 150);
+					return;
+				}
+				
 				JFileChooser chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				
@@ -162,7 +176,7 @@ public class MusicPlayer extends JFrame {
 					JPopupMenu popup = new JPopupMenu("Popup");
 					int musicAddCount = 0;
 
-					Playlist playlist = new Playlist(path.getName(), "arthur");
+					Playlist playlist = new Playlist(path.getName(), currentUser.getUsername());
 					
 					for (File file : files) {
 						int index = file.getName().lastIndexOf(".");
@@ -185,7 +199,7 @@ public class MusicPlayer extends JFrame {
 		JSeparator separator = new JSeparator();
 		mnPlaylists.add(separator);
 		
-		for (Playlist playlist : PlaylistDAO.getPlaylists(new User("arthur", "123", true))){
+		for (Playlist playlist : PlaylistDAO.getPlaylists(currentUser)){
 			JMenuItem item = new JMenuItem(playlist.getName());
 			item.addActionListener(new ActionListener() {
 				
@@ -275,7 +289,8 @@ public class MusicPlayer extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				LogIn newLogin = new LogIn ();
 				newLogin.setVisible (true);
-				player.dispose();
+				if (player != null)
+					player.dispose();
 				dispose();
 			}
 		});
@@ -411,5 +426,13 @@ public class MusicPlayer extends JFrame {
 		
 		
 		contentPane.setLayout(gl_contentPane);
+	}
+
+	public User getCurrentUser() {
+		return currentUser;
+	}
+
+	public void setCurrentUser(User currentUser) {
+		this.currentUser = currentUser;
 	}
 }
